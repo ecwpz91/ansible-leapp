@@ -1,3 +1,22 @@
+# IDE
+*.iml
+.idea
+.workspace/
+
+# Packer
+build.log
+vars.json
+
+# Compiled classes
+/target
+
+# pass
+vault_pass
+aws-credentials
+*.retry
+private*
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
