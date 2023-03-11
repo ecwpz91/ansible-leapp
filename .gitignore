@@ -1,7 +1,7 @@
 # IDE
 *.iml
 .idea
-.workspace/
+*workspace*
 
 # Packer
 build.log
