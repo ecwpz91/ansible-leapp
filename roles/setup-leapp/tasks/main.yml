@@ -1,0 +1,137 @@
+---
+
+- name: Upgrade all packages
+  ansible.builtin.dnf:
+    name: '*'
+    state: latest
+
+- name: Enable required RHUI repositories and install required RHUI packages to ensure your system is ready for upgrade
+  command: dnf config-manager --set-enabled rhui-client-config-server-8
+  when: (ansible_distribution == "RedHat" and ansible_distribution_version >= "8.7")
+
+- name: Install logical volume manager (LVM) tools
+  ansible.builtin.dnf:
+    name:
+      - 'lvm2*'
+    state: latest
+
+- name: Install the latest version of Leapp (and BOOM)
+  ansible.builtin.dnf:
+    name:
+      - leapp 
+      - leapp-upgrade 
+      - leapp-repository 
+      - leapp-rhui-aws
+      # - rh-amazon-rhui-client-ha 
+      # - leapp-repository-deps
+      # - lvm2-python-boom
+    state: latest
+
+- name: Install a sample web server for testing leapp
+  ansible.builtin.dnf:
+    name:
+      - httpd
+      - firewalld
+    state: latest
+
+- name: Add content to sample web server for testing leapp
+  copy:
+    content: "Hello World"
+    dest: /var/www/html/index.html
+
+- name: Enable service httpd, and not touch the state
+  ansible.builtin.service:
+    name: httpd
+    enabled: yes
+
+- name: Start service httpd, if not started
+  ansible.builtin.service:
+    name: httpd
+    state: started
+
+- name: Permit traffic in default zone for http service
+  ansible.posix.firewalld:
+    service: http
+    permanent: true
+    state: enabled
+
+# - name: Create a new primary partition
+#   parted:
+#     label: gpt
+#     device: "{{ os_leapp_block_device }}"
+#     number: 1
+#     state: present
+#     part_end: 1GB
+
+# - name: Create a secondary partition
+#   parted:
+#     label: gpt
+#     device: "{{ os_leapp_block_device }}"
+#     number: 2
+#     state: present
+#     part_start: 1GB
+
+# - name: Create physical volume
+#   command: "pvcreate {{ os_leapp_block_device }}2"
+
+# - name: Create volume group
+#   lvg:
+#     vg: rhel
+#     pvs: "{{ os_leapp_block_device }}2"
+
+# - name: Create root logical volume
+#   lvol:
+#     vg: rhel
+#     lv: root
+#     size: 12G
+
+# - name: Make xfs filesystem for root
+#   filesystem:
+#     fstype: xfs
+#     dev: "/dev/rhel/root"
+
+# - name: Create swap logical volume
+#   lvol:
+#     vg: rhel
+#     lv: swap
+#     size: +100%FREE
+
+# - name: Make xfs filesystem for root
+#   filesystem:
+#     fstype: xfs
+#     dev: "/dev/rhel/swap"
+
+# - name: Inform the OS of partition table changes
+#   command: "partprobe"
+
+# - name: Unconditionally reboot the machine with all defaults
+#   ansible.builtin.reboot:
+#     reboot_timeout: 3600
+
+- name: Install cockpit utility to view the upgrade report
+  ansible.builtin.dnf:
+    name:
+      - cockpit
+      - cockpit-leapp
+    state: latest
+
+- name: Enable service cockpit, and not touch the state
+  ansible.builtin.service:
+    name: cockpit
+    enabled: yes
+
+- name: Start service cockpit, if not started
+  ansible.builtin.service:
+    name: cockpit
+    state: started
+
+- name: Permit traffic in default zone for cockpit service
+  ansible.posix.firewalld:
+    service: cockpit
+    permanent: true
+    state: enabled
+
+- name: Generate leapp preupgrade report
+  command: leapp preupgrade --target 9.0 --debug
+  register: leapp_preupgrade
+  when: (ansible_distribution == "RedHat" and ansible_distribution_version >= "8.5")
