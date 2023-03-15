@@ -1,0 +1,24 @@
+---
+
+- name: Provision instances
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  vars_files:
+  - ../group_vars/all/vars.yml  
+  roles:
+   - ../roles/aws-provision
+
+# - name: Refresh hosts
+#   hosts: localhost
+
+# - name: Register hosts
+#   hosts: created_vms
+#   remote_user: "{{ remote_user_name }}"
+#   vars:
+#     state: 'present'
+#   roles:
+#     - ../roles/rhel-common
+
+# - name: Refresh hosts
+#   hosts: localhost

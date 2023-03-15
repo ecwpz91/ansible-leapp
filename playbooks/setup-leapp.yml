@@ -1,0 +1,8 @@
+---
+
+- name: Setup leapp
+  hosts: leappdemo
+  vars_files:
+  - ../group_vars/all/vars.yml  
+  roles:
+   - ../roles/setup-leapp
