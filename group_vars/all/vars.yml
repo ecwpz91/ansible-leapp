@@ -1,0 +1,90 @@
+---
+
+domain: "mydomainname"
+prefix: "apps"
+namespace: "ose"
+suffix: "mjs"
+intranet: "local.ose"
+app_id: "leappdemo"
+role: "platform"
+cluster: "mycluster"
+deploy_env: "dev"
+release: "1.0.0"
+workspace: "{{ lookup('env','PWD') }}/.{{ domain }}"
+http_port: 80
+http_proxy_port: 8080
+https_port: 443
+https_proxy_port: 8443
+ssh_port: 22
+cockpit_port: 9090
+
+#---------------------------------------------------
+# Remote User
+#---------------------------------------------------
+remote_user_name: "ec2-user"
+remote_user_key: "libre"
+remote_user_key_file: "{{ workspace }}/{{ remote_user_key }}"
+remote_user_home: "/home/{{ remote_user_name }}"
+remote_user_ssh_path: "{{ remote_user_home }}/.ssh"
+remote_user_ssh_conf: "{{ remote_user_ssh_path }}/config"
+
+#---------------------------------------------------
+# Subscription Manager
+#---------------------------------------------------
+# rhsm_user_name: "{{ vault_rhsm_user_name }}"
+# rhsm_user_pass: "{{ vault_rhsm_user_pass }}"
+# rhsm_pool_id: "{{ vault_rhsm_pool_id }}"
+
+rhsm_key_id: "myrhsmkeyid"
+rhsm_org_id: "myrhsmorgid"
+
+#---------------------------------------------------
+# Ansible Engine
+#---------------------------------------------------
+ansible_user: "{{ remote_user_name }}"
+ansible_ssh_private_key_file: "{{ remote_user_key_file }}"
+
+#---------------------------------------------------
+# Ansible Tower
+#---------------------------------------------------
+awx_user_name: "myawsusername"
+awx_user_pass: "myawxuserpass"
+
+#---------------------------------------------------
+# Amazon web Services
+#---------------------------------------------------
+aws_access_key: "myawsaccesskey"
+aws_secret_key: "myawssecretkey"
+
+# Network
+aws_region: "us-east-1"
+route53_hosted_zone_id: "myroute53hostedzoneid"
+vpc_cidr_block: 10.0.0.0/16
+public_subnet_1_cidr: 10.0.0.0/24
+public_route_cidr_block: 0.0.0.0/0
+
+# Tags
+ec2_tag: "{{ prefix }}-{{ namespace }}-{{ suffix }}"
+vpc_tag: "{{ namespace }}-vpc"
+vpc_subnet_tag: "{{ namespace }}-subnet"
+vpc_route_tag: "{{ namespace }}-route"
+
+# Groups
+ec2_security_group: "{{ namespace }}-default-sg"
+ec2_security_group_ingress: "{{ namespace }}-ingress-sg"
+ec2_security_group_egress: "{{ namespace }}-egress-sg"
+ec2_security_group_ssh: "{{ namespace }}-ssh-sg"
+ec2_security_group_cockpit: "{{ namespace }}-cockpit-sg"
+
+# Instance --> https://access.redhat.com/solutions/15356
+ec2_image: myrhec2imageid
+redhat_owner_id: myrhec2imageownerid
+ec2_instance_type: t2.medium
+ec2_instance_count: 1
+
+# System
+os_root_vol_size: 25
+
+# Leapp
+os_leapp_block_device: /dev/xvdb
+os_leapp_vol_size: 15
